@@ -83,6 +83,9 @@ public:
   /// makes a hardlink of "this" that points to A.
   int makehardlink(const Fileinfo& A);
 
+  /// on COW filesystem makes a reflink of "this" that points to A.
+  int makereflink(const Fileinfo& A);
+
   /**
    * deletes the file from the file system
    * @return zero on success
@@ -94,6 +97,9 @@ public:
 
   // makes a hard link of A that points to B
   static int static_makehardlink(Fileinfo& A, const Fileinfo& B);
+
+  // makes a hard link of A that points to B
+  static int static_makereflink(Fileinfo& A, const Fileinfo& B);
 
   // deletes file A, that is a duplicate of B
   static int static_deletefile(Fileinfo& A, const Fileinfo& B);

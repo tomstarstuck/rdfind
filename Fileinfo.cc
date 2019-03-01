@@ -17,6 +17,9 @@
 #include <sys/stat.h> //for file info
 #include <unistd.h>   //for unlink etc.
 
+// BSD clonefile
+#include <sys/clonefile.h>
+
 // project
 #include "Checksum.hh" //checksum calculation
 #include "Fileinfo.hh"
@@ -301,6 +304,21 @@ Fileinfo::makehardlink(const Fileinfo& A)
   });
 }
 
+// makes a reflink for COW filesystems
+int
+Fileinfo::makereflink(const Fileinfo& A)
+{
+  return transactional_operation(name(), [&](const std::string& filename) {
+    // use clonefile as an alternative to reflink on BSD systems.
+    const int retval = clonefile(A.name().c_str(), filename.c_str(), 0);
+    if (retval) {
+      std::cerr << "Failed to make hardlink " << filename << " to " << A.name()
+                << '\n';
+    }
+    return retval;
+  });
+}
+
 int
 Fileinfo::static_deletefile(Fileinfo& A, const Fileinfo& /*B*/)
 {
@@ -317,4 +335,10 @@ int
 Fileinfo::static_makehardlink(Fileinfo& A, const Fileinfo& B)
 {
   return A.makehardlink(B);
+}
+
+int
+Fileinfo::static_makereflink(Fileinfo& A, const Fileinfo& B)
+{
+  return A.makereflink(B);
 }

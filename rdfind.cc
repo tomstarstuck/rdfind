@@ -66,6 +66,8 @@ usage()
        "symbolic links\n"
     << " -makehardlinks     true |(false) replace duplicate files with "
        "hard links\n"
+    << " -makereflinks      true |(false) replace duplicate files with "
+       "copy on write clones\n"
     << " -makeresultsfile  (true)| false  makes a results file\n"
     << " -outputname  name  sets the results file name to \"name\" "
        "(default results.txt)\n"
@@ -91,6 +93,7 @@ struct Options
   // operation mode and default values
   bool makesymlinks = false;   // turn duplicates into symbolic links
   bool makehardlinks = false;  // turn duplicates into hard links
+  bool makereflinks = false;  // turn duplicates into COW clones
   bool makeresultsfile = true; // write a results file
   Fileinfo::filesizetype minimumfilesize =
     1; // minimum file size to be noticed (0 - include empty files)
@@ -128,6 +131,8 @@ parseOptions(Parser& parser)
       o.makesymlinks = parser.get_parsed_bool();
     } else if (parser.try_parse_bool("-makehardlinks")) {
       o.makehardlinks = parser.get_parsed_bool();
+    } else if (parser.try_parse_bool("-makereflinks")) {
+      o.makereflinks = parser.get_parsed_bool();
     } else if (parser.try_parse_bool("-makeresultsfile")) {
       o.makeresultsfile = parser.get_parsed_bool();
     } else if (parser.try_parse_string("-outputname")) {
@@ -387,6 +392,14 @@ main(int narg, const char* argv[])
     std::cout << dryruntext << "Now making hard links." << std::endl;
     const auto tmp = gswd.makehardlinks(o.dryrun);
     std::cout << dryruntext << "Making " << tmp << " links." << std::endl;
+    return 0;
+  }
+
+  // traverse the list and replace with reflinks
+  if (o.makereflinks) {
+    std::cout << dryruntext << "Now making clone." << std::endl;
+    const auto tmp = gswd.makereflinks(o.dryrun);
+    std::cout << dryruntext << "Making " << tmp << " clones." << std::endl;
     return 0;
   }
 

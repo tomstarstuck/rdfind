@@ -96,6 +96,9 @@ public:
   /// make hardlinks of duplicates.
   std::size_t makehardlinks(bool dryrun) const;
 
+  /// make reflinks of duplicates.
+  std::size_t makereflinks(bool dryrun) const;
+
   /// delete duplicates from file system.
   std::size_t deleteduplicates(bool dryrun) const;
 

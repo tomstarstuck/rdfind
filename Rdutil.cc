@@ -175,6 +175,19 @@ Rdutil::makehardlinks(bool dryrun) const
     return applyactiononfile(m_list, &Fileinfo::static_makehardlink);
 }
 
+std::size_t
+Rdutil::makereflinks(bool dryrun) const
+{
+  if (dryrun) {
+    const bool outputBname = true;
+    dryrun_helper<outputBname> obj("reflink ", " to ");
+    const auto ret = applyactiononfile(m_list, obj);
+    std::cout.flush();
+    return ret;
+  } else
+    return applyactiononfile(m_list, &Fileinfo::static_makereflink);
+}
+
 // mark files with a unique number
 void
 Rdutil::markitems()
